@@ -8,6 +8,8 @@
 #define WINDOW_HEIGHT 800
 #define MLX_ERROR 1
 
+
+
 typedef struct s_img
 {
 	void	*img;
@@ -32,6 +34,8 @@ typedef struct s_data
 	int		sx;
 	int		sy;
 	int		err;
+
+	int speed;
 
 }			t_data;
 
@@ -99,7 +103,7 @@ int	rendering(t_data *data)
 {
 	int	e2;
 
-	if (data->x0 % 5 == 0)
+	if (data->x0 % data->speed == 0)
         screenplay(&data->img, data->x0, data->y0);
     
 	if ((data->x0 != data->x1) || (data->y0 != data->y1))
@@ -121,6 +125,10 @@ int	rendering(t_data *data)
 	}
 	else
 	{
+		data->x0 = 120;
+		data->x1 = 865;
+		data->y0 = 153;
+		data->y1 = 600;
 		data->dx = abs(865 - 120);
 		data->dy = abs(600 - 153);
 		data->sx = (120 < 865) ? 1 : -1;
@@ -132,9 +140,31 @@ int	rendering(t_data *data)
 	// void animate_circle(t_img *data, int x0, int y0, int x1, int y1)
 }
 
+#include <stdio.h>
+
+int mouse_press(int button, int x, int y, t_data *data)
+{
+    (void)y;
+	(void)x;
+	(void)button;
+
+	// printf("I was here\n");
+	data->x0 = 120;
+	data->x1 = 865;
+	data->y0 = 153;
+	data->y1 = 600;
+	data->dx = abs(865 - 120);
+	data->dy = abs(600 - 153);
+	data->sx = (120 < 865) ? 1 : -1;
+	data->sy = (153 < 600) ? 1 : -1;
+	data->err = data->dx - data->dy;
+	data->speed *= 5;
+}
+
 int	main(void)
 {
 	t_data data;
+	data.speed = 3;
 	data.x0 = 120;
 	data.x1 = 865;
 	data.y0 = 153;
@@ -158,6 +188,6 @@ int	main(void)
 	data.img.addr = mlx_get_data_addr(data.img.img, &data.img.bits_per_pixel,
 			&data.img.line_length, &data.img.endian);
 	mlx_loop_hook(data.mlx, &rendering, &data);
-    mlx_hook(data.mlx, )
+    mlx_hook(data.window, 4, 1L<<2, &mouse_press, &data);
 	mlx_loop(data.mlx);
 }
